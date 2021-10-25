@@ -1,0 +1,35 @@
+{
+  "name": "@angular-package/name",
+  "version": "0.0.1",
+  "description": "The name with prefix and suffix.",
+  "author": "Angular Package <contact@angular-package.dev> (https://angular-package.dev)",
+  "homepage": "https://github.com/angular-package/name#readme",
+  "peerDependencies": {
+    "@angular-package/type": "^5.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular-package/testing": "^2.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "keywords": [
+    "Generate name",
+    "Name",
+    "Prefix",
+    "Suffix",
+    "Affix"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/angular-package/name.git"
+  },
+  "bugs": {
+    "url": "https://github.com/angular-package/name/issues"
+  },
+  "license": "MIT"
+}
