@@ -27,6 +27,12 @@ export class Suffix<Min extends number, Max extends number> extends Affix<
   //#region properties.
   //#region static properties.
   //#region static public properties.
+  static get [Symbol.toStringTag](): string {
+    return 'suffix';
+  }
+  //#endregion static public properties.
+
+  //#region static private properties.
   /**
    *
    */
@@ -41,7 +47,7 @@ export class Suffix<Min extends number, Max extends number> extends Affix<
    *
    */
   static #suffix: Suffix<any, any> | undefined;
-  //#endregion static public properties.
+  //#endregion static private properties.
   //#endregion static properties.
 
   //#region instance public properties.
@@ -58,6 +64,10 @@ export class Suffix<Min extends number, Max extends number> extends Affix<
   public get length(): number {
     return super.length;
   }
+
+  get [Symbol.toStringTag](): string {
+    return 'suffix';
+  }
   //#endregion instance public properties.
   //#endregion properties.
 
@@ -73,7 +83,17 @@ export class Suffix<Min extends number, Max extends number> extends Affix<
     settings?: SuffixSettings<Min, Max>,
     callback?: ResultCallback<string, SuffixSettings<Min, Max>>
   ): Suffix<Min, Max> {
-    return new Suffix(suffix, this.#pickConfiguration(settings), callback);
+    return new Suffix(
+      suffix,
+      {
+        length: {
+          ...this.#length.get,
+          ...settings?.length,
+        },
+        pattern: settings?.pattern || this.#pattern,
+      },
+      callback
+    );
   }
 
   /**
@@ -156,10 +176,8 @@ export class Suffix<Min extends number, Max extends number> extends Affix<
     settings: SuffixSettings<Min, Max>,
     callback?: ResultCallback<SuffixSettings<Min, Max>>
   ): typeof Suffix {
-    this.setLength(this.#pickLength(settings), callback as any).setPattern(
-      this.#pickPattern(settings) as RegExp,
-      callback as any
-    );
+    isDefined(settings.length) && this.setLength(settings.length);
+    isDefined(settings.pattern) && this.setPattern(settings.pattern);
     return this;
   }
 
@@ -173,7 +191,7 @@ export class Suffix<Min extends number, Max extends number> extends Affix<
     length: MinMax<Min, Max>,
     callback?: ResultCallback<MinMax<Min, Max>>
   ): typeof Suffix {
-    this.#length = new Range(length, callback);
+    this.#length = new Range({ ...this.#length.get, ...length }, callback);
     return this;
   }
 
@@ -187,10 +205,7 @@ export class Suffix<Min extends number, Max extends number> extends Affix<
     callback?: ResultCallback<Max>
   ): typeof Suffix {
     guardNumber(max, callback) &&
-      (this.#length = new Range({
-        ...(isDefined(this.#length.min) && { min: this.#length.min }),
-        max,
-      }));
+      (this.#length = new Range({ min: this.#length.min, max }));
     return this;
   }
 
@@ -204,10 +219,7 @@ export class Suffix<Min extends number, Max extends number> extends Affix<
     callback?: ResultCallback<Min>
   ): typeof Suffix {
     guardNumber(min, callback) &&
-      (this.#length = new Range({
-        min,
-        ...(isDefined(this.#length.max) && { max: this.#length.max }),
-      }));
+      (this.#length = new Range({ min, max: this.#length.max }));
     return this;
   }
 
@@ -239,7 +251,13 @@ export class Suffix<Min extends number, Max extends number> extends Affix<
   ): typeof Suffix {
     this.#suffix = new Suffix(
       suffix,
-      this.#pickConfiguration(settings),
+      {
+        length: {
+          ...this.#length.get,
+          ...settings?.length,
+        },
+        pattern: settings?.pattern || this.#pattern,
+      },
       callback
     );
     return this;
@@ -247,48 +265,15 @@ export class Suffix<Min extends number, Max extends number> extends Affix<
   //#endregion static public methods.
 
   //#region static private methods.
-  /**
-   *
-   * @param settings
-   * @returns
-   */
-  static #pickConfiguration<Min extends number, Max extends number>(
-    settings?: SuffixSettings<Min, Max>
-  ): SuffixConfiguration<Min, Max>['default'] {
-    return {
-      length: this.#pickLength(settings),
-      pattern: this.#pickPattern(settings),
-    };
-  }
-
-  /**
-   *
-   * @param settings
-   * @returns
-   */
-  static #pickLength<Min extends number, Max extends number>(
-    settings?: SuffixSettings<Min, Max>
-  ): MinMax<Min, Max> {
-    return { ...this.#length.get, ...settings?.length };
-  }
-
-  /**
-   *
-   * @param settings
-   * @returns
-   */
-  static #pickPattern(settings?: SuffixSettings): RegExp | undefined {
-    return settings?.pattern || this.#pattern;
-  }
   //#endregion static private methods.
   //#endregion static methods.
 
   //#region constructor.
   /**
-   *
-   * @param suffix
-   * @param settings
-   * @param callback
+   * 
+   * @param suffix 
+   * @param settings 
+   * @param callback 
    */
   constructor(
     suffix: string,
@@ -299,6 +284,7 @@ export class Suffix<Min extends number, Max extends number> extends Affix<
   }
   //#endregion constructor.
 
+  //#region instance methods.
   //#region instance public methods.
   /**
    * Returns the actual configuration for the `suffix` of a `Suffix` instance.
@@ -315,5 +301,6 @@ export class Suffix<Min extends number, Max extends number> extends Affix<
   public valueOf(): string {
     return super.valueOf();
   }
-  //#endregion static public methods.
+  //#endregion instance public methods.
+  //#endregion instance methods.
 }
